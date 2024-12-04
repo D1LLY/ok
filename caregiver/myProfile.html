@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 20px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        header .balance {
+            font-size: 16px;
+            font-weight: bold;
+            margin-right: 20px;
+        }
+        nav {
+            background-color: #0056b3;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            padding: 10px 0;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        main {
+            margin-top: 20px;
+            width: 90%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+        .card {
+            background-color: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 250px;
+            text-align: left;
+        }
+        .card h3 {
+            margin: 0 0 10px;
+            font-size: 20px;
+            color: #333;
+        }
+        .card p {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #666;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+    <script>
+        const balanceElement = document.getElementById('balanceDisplay');
+        
+        async function fetchProfileData() {
+            try {
+                const response = await fetch('myProfile.php');
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('balanceDisplay').textContent = `$${parseFloat(data.member.balance).toFixed(2)}`;
+
+                    // member card 
+                    populateCards(data.member); 
+                } else {
+                    console.error('Error:', data.message);
+                }
+            } catch (error) {
+                console.error('Error fetching profile data:', error);
+            }
+        }
+
+        function populateCards(member) {
+            const mainElement = document.getElementById('main');
+            // Create the profile card
+            const card = document.createElement('div');
+            card.classList.add('card');
+            card.innerHTML = `
+                <h3>${member.username}</h3>
+                <p><strong>Address:</strong> ${member.address}</p>
+                <p><strong>Rating:</strong> ${member.averageRating} / 5</p>
+                <p><strong>Balance:</strong> $${parseFloat(member.balance).toFixed(2)}</p>
+                <p><strong>Availability:</strong> ${member.availability} hours/week</p>
+                <p><strong>Phone:</strong> ${member.phoneNumber}</p> <!-- Added phone number -->
+            `;
+            mainElement.appendChild(card);
+        }
+
+        async function fetchReviews() {
+            try {
+                const response = await fetch('fetchReviews.php');
+                const data = await response.json();
+                console.log(data); 
+
+                if (data.success) {
+                    populateReviewsTable(data.reviews);
+                } else {
+                    document.getElementById('reviewsMessage').textContent = data.message;
+                }
+            } catch (error) {
+                console.error('Error fetching reviews:', error);
+            }
+        }
+
+        function populateReviewsTable(reviews) {
+            const reviewsContainer = document.getElementById('reviewsContainer');
+            const table = document.createElement('table');
+            table.innerHTML = `
+                <thead>
+                    <tr>
+                        <th>Rating</th>
+                        <th>Contract ID</th>
+                        <th>Date of Completion</th>
+                        <th>Hours Worked Daily</th>
+                        <th>Total Days Worked</th>
+                        <th>Money Earned</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            `;
+            const tbody = table.querySelector('tbody');
+            reviews.forEach(review => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${review.rating}</td>
+                    <td>${review.contractID}</td>
+                    <td>${review.dateOfCompletion}</td>
+                    <td>${review.hoursWorkedDaily}</td>
+                    <td>${review.totalDaysWorked}</td>
+                    <td>$${review.moneyEarned.toFixed(2)}</td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            reviewsContainer.appendChild(table);  
+        }
+
+        window.onload = function() {
+            fetchProfileData(); 
+            fetchReviews(); 
+        };
+    </script>
+</head>
+<body>
+    <header>
+        <h1>My Profile</h1>
+        <div class="balance">Balance: <span id="balanceDisplay">Loading...</span></div>
+    </header>
+    <nav>
+        <a href="home.html">Home</a>
+        <a href="RequestCare.html">Request Caregiver</a>
+        <a href="findContract.html">Caregiver Listings</a>
+        <a href="submit_contract.html">Create Contract</a>
+        <a href="updateProfile.html">Update Profile</a>
+        <a href="myProfile.html">View Profile</a>
+    </nav>
+    <main id="main">
+    </main>
+    <div id="reviewsContainer">
+    </div>
+</body>
+</html>

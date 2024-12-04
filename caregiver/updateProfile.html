@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Profile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 20px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        nav {
+            background-color: #0056b3;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            padding: 10px 0;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        main {
+            margin-top: 20px;
+            width: 90%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+        form {
+            width: 100%;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            font-size: 16px;
+            margin-bottom: 8px;
+            display: block;
+        }
+        input[type="text"], input[type="submit"], input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        input[type="submit"] {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Update Profile</h1>
+    </header>
+    <nav>
+	<a href="home.html">Home</a>
+        <a href="RequestCare.html">Request Caregiver</a>
+        <a href="findContract.html">Caregiver Listings</a>
+        <a href="submit_contract.html">Create Contract</a>
+        <a href="updateProfile.html">Update Profile</a>
+        <a href="myProfile.html">View Profile</a>
+    </nav>
+
+    <main>
+        <h2>Update Your Profile</h2>
+        
+        <!-- Update Availability Form -->
+        <form action="updateProfile.php" method="POST">
+            <label for="availability">Update Availability (hours/week):</label>
+            <input type="number" id="availability" name="availability" min="0" placeholder="Enter new availability" required>
+            <input type="submit" value="Update Availability">
+            <input type="hidden" name="action" value="updateAvailability">
+        </form>
+
+        <!-- Update Address Form -->
+        <form action="updateProfile.php" method="POST">
+            <label for="address">Update Address:</label>
+            <input type="text" id="address" name="address" placeholder="Enter new address" required>
+            <input type="submit" value="Update Address">
+            <input type="hidden" name="action" value="updateAddress">
+        </form>
+
+        <!-- Update Phone Number Form -->
+        <form action="updateProfile.php" method="POST">
+            <label for="phone">Update Phone Number:</label>
+            <input type="text" id="phone" name="phone" placeholder="Enter new phone number" required>
+            <input type="submit" value="Update Phone Number">
+            <input type="hidden" name="action" value="updatePhone">
+        </form>
+    </main>
+</body>
+</html>

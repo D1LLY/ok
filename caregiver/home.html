@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HOME</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 20px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        header .stats {
+            display: flex;
+            gap: 20px;
+            font-size: 16px;
+        }
+        header .stats div {
+            font-weight: bold;
+        }
+        nav {
+            background-color: #0056b3;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 20px;
+            align-items: center;
+        }
+        nav .links {
+            display: flex;
+            gap: 15px;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        .document-menu {
+            position: relative;
+        }
+        .document-icon {
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .document-dropdown {
+            display: none;
+            position: absolute;
+            top: 30px;
+            right: 0;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            width: 300px;
+        }
+        .document-dropdown.active {
+            display: block;
+        }
+        .document-dropdown h3 {
+            margin: 0;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border-bottom: 1px solid #ccc;
+            font-size: 16px;
+        }
+        .document-item {
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+            cursor: pointer;
+        }
+        .document-item:last-child {
+            border-bottom: none;
+        }
+        .document-item:hover {
+            background-color: #f9f9f9;
+        }
+        main {
+            margin-top: 20px;
+            width: 90%;
+            max-width: 800px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+        .card {
+            background-color: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 250px;
+            text-align: left;
+        }
+        .card h3 {
+            margin: 0 0 10px;
+            font-size: 20px;
+            color: #333;
+        }
+        .card p {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+    <script>
+        async function fetchProfileData() {
+            try {
+                const response = await fetch('home.php');
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('balanceDisplay').textContent = `$${parseFloat(data.user.balance).toFixed(2)}`;
+                    document.getElementById('reviewDisplay').textContent = `${data.user.averageRating} / 5`;
+                    document.getElementById('availabilityDisplay').textContent = `${data.user.availability} hours/week`;
+
+                    populateCards(data.members);
+                } else {
+                    console.error('Error:', data.message);
+                }
+            } catch (error) {
+                console.error('Error fetching profile data:', error);
+            }
+        }
+
+        function populateCards(members) {
+            const mainElement = document.getElementById('main');
+            mainElement.innerHTML = '';
+
+            members.forEach(member => {
+                const card = document.createElement('div');
+                card.classList.add('card');
+                card.innerHTML = `
+                    <h3>${member.username}</h3>
+                    <p><strong>Address:</strong> ${member.address}</p>
+                    <p><strong>Rating:</strong> ${member.averageRating} / 5</p>
+                    <p><strong>Balance:</strong> $${parseFloat(member.balance).toFixed(2)}</p>
+                    <p><strong>Availability:</strong> ${member.availability} hours/week</p>
+                `;
+                mainElement.appendChild(card);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchProfileData();
+
+            const documentIcon = document.querySelector('.document-icon');
+            const documentDropdown = document.querySelector('.document-dropdown');
+
+            documentIcon.addEventListener('click', () => {
+                documentDropdown.classList.toggle('active');
+            });
+        });
+    </script>
+</head>
+<body>
+    <header>
+        <h1>Home</h1>
+        <div class="stats">
+            <div>Balance: <span id="balanceDisplay">Loading...</span></div>
+            <div>Reviews: <span id="reviewDisplay">Loading...</span></div>
+            <div>Weekly Availability: <span id="availabilityDisplay">Loading...</span></div>
+        </div>
+    </header>
+    <nav>
+        <div class="links">
+            <a href="RequestCare.html">Request Caregiver</a>
+            <a href="findContract.html">Caregiver Listings</a>
+            <a href="submit_contract.html">Create Contract</a>
+            <a href="updateProfile.html">Update Profile</a>
+            <a href="myProfile.html">Profile</a>
+        </div>
+        <div class="document-menu">
+            <div class="document-icon">
+                📄 <span></span>
+            </div>
+            <div class="document-dropdown">
+                <h3>Contracts</h3>
+                <div class="document-item" onclick="window.location.href='hiring.html'">Hiring Contracts</div>
+                <div class="document-item" onclick="window.location.href='working.html'">Working Contracts</div>
+            </div>
+        </div>
+    </nav>
+    <main id="main">
+        <!-- Member cards will be dynamically inserted here -->
+    </main>
+</body>
+</html>

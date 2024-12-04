@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Care</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 20px;
+            width: 100%;
+            text-align: center;
+        }
+	nav {
+            background-color: #0056b3;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            padding: 10px 0;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        form {
+            background-color: white;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+        form label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        form select, form input, form button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        form button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        form button:hover {
+            background-color: #0056b3;
+        }
+        .message {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            width: 300px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+    <script>
+        // Fetch parents and populate dropdown
+        async function fetchParents() {
+            try {
+                const response = await fetch('fetch_parents.php');
+                const data = await response.json();
+
+                if (data.success) {
+                    populateParentDropdown(data.parents);
+                } else {
+                    const parentDropdown = document.getElementById('parentID');
+                    parentDropdown.innerHTML = '<option value="">No parents found</option>';
+                }
+            } catch (error) {
+                console.error('Error fetching parents:', error);
+            }
+        }
+
+        function populateParentDropdown(parents) {
+            const parentDropdown = document.getElementById('parentID');
+            parentDropdown.innerHTML = ''; // Clear previous options
+
+            parents.forEach(parent => {
+                const option = document.createElement('option');
+                option.value = parent.parentID;
+                option.textContent = parent.parentName;
+                parentDropdown.appendChild(option);
+            });
+        }
+
+        // Show message dynamically
+        function showMessage(type, message) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.className = `message ${type}`;
+            messageDiv.textContent = message;
+        }
+
+        // Handle form submission with AJAX
+        async function submitForm(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const form = document.querySelector('form');
+            const formData = new FormData(form);
+
+            try {
+                const response = await fetch('RequestCare.php', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                if (data.success) {
+                    showMessage('success', data.message || 'Request submitted successfully!');
+                } else {
+                    showMessage('error', data.message || 'Failed to submit request.');
+                }
+            } catch (error) {
+                showMessage('error', 'An error occurred while submitting the request.');
+                console.error('Error submitting request:', error);
+            }
+        }
+
+        // Initialize page
+        window.onload = function () {
+            fetchParents();
+            document.querySelector('form').addEventListener('submit', submitForm);
+        };
+    </script>
+</head>
+<body>
+    <header>
+        <h1>Request Care</h1>
+     <nav>
+	<a href="home.html">Home</a>
+        <a href="RequestCare.html">Request Caregiver</a>
+        <a href="findContract.html">Caregiver Listings</a>
+        <a href="submit_contract.html">Create Contract</a>
+        <a href="updateProfile.html">Update Profile</a>
+        <a href="myProfile.html">View Profile</a>
+    </nav>
+    </header>
+    <form>
+        <label for="parentID">Select Parent:</label>
+        <select name="parentID" id="parentID" required>
+            <option value="">Loading parents...</option>
+        </select>
+
+        <label for="startDate">Start Date:</label>
+        <input type="date" name="startDate" id="startDate" required>
+
+        <label for="startTime">Start Time:</label>
+        <input type="time" name="startTime" id="startTime" required>
+
+        <label for="endDate">End Date:</label>
+        <input type="date" name="endDate" id="endDate" required>
+
+        <label for="endTime">End Time:</label>
+        <input type="time" name="endTime" id="endTime" required>
+
+        <button type="submit">Submit Request</button>
+    </form>
+
+    <div id="message"></div>
+</body>
+</html>

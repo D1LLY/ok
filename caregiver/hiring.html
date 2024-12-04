@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hiring Contracts</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 20px;
+            width: 100%;
+            text-align: center;
+        }
+        main {
+            margin-top: 20px;
+            width: 90%;
+            max-width: 800px;
+        }
+        .card {
+            background-color: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .card h3 {
+            margin: 0 0 10px;
+            font-size: 20px;
+            color: #333;
+        }
+        .card p {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #666;
+        }
+        .card select {
+            margin-top: 10px;
+            width: 100%;
+            padding: 10px;
+        }
+        .card button {
+            margin-top: 10px;
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .card button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+    <script>
+        async function fetchHiringContracts() {
+            try {
+                const response = await fetch('fetch_hiring_contracts.php');
+                const data = await response.json();
+
+                if (data.success) {
+                    populateContracts(data.contracts);
+                } else {
+                    document.getElementById('main').innerHTML = `<p>${data.message}</p>`;
+                }
+            } catch (error) {
+                console.error('Error fetching hiring contracts:', error);
+                document.getElementById('main').innerHTML = `<p>Failed to load hiring contracts.</p>`;
+            }
+        }
+
+        function populateContracts(contracts) {
+            const mainElement = document.getElementById('main');
+            mainElement.innerHTML = '';
+
+            contracts.forEach(contract => {
+                const card = document.createElement('div');
+                card.classList.add('card');
+                card.innerHTML = `
+                    <h3>Caretaker: ${contract.caretakerName}</h3>
+                    <p><strong>Start Date:</strong> ${contract.startDate}</p>
+                    <p><strong>End Date:</strong> ${contract.endDate}</p>
+                    <p><strong>Status:</strong> ${contract.status}</p>
+                    <input type="hidden" id="requestID-${contract.contractID}" value="${contract.requestID}">
+                    <select id="status-${contract.contractID}">
+                        <option value="pending" ${contract.status === 'pending' ? 'selected' : ''}>Pending</option>
+                        <option value="accepted" ${contract.status === 'accepted' ? 'selected' : ''}>Accepted</option>
+                        <option value="denied" ${contract.status === 'denied' ? 'selected' : ''}>Denied</option>
+                    </select>
+                    <button onclick="updateContractStatus(${contract.contractID})">Update Status</button>
+                `;
+                mainElement.appendChild(card);
+            });
+        }
+
+        async function updateContractStatus(contractID) {
+            const statusElement = document.getElementById(`status-${contractID}`);
+            const requestID = document.getElementById(`requestID-${contractID}`).value;
+            const status = statusElement.value;
+
+            try {
+                const response = await fetch('update_contract.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ contractID, status, requestID })
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    alert(data.message);
+                    fetchHiringContracts();
+                } else {
+                    alert(`Failed to update contract: ${data.message}`);
+                }
+            } catch (error) {
+                console.error('Error updating contract status:', error);
+                alert('An error occurred while updating the contract status.');
+            }
+        }
+
+        window.onload = fetchHiringContracts;
+    </script>
+</head>
+<body>
+    <header>
+        <h1>Hiring Contracts</h1>
+    </header>
+    <main id="main">
+        <!-- Contracts will be dynamically inserted here -->
+    </main>
+</body>
+</html>

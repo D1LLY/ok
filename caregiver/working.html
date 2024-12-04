@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Working Contracts</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 20px;
+            width: 100%;
+            text-align: center;
+        }
+        main {
+            margin-top: 20px;
+            width: 90%;
+            max-width: 1000px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+        .card {
+            background-color: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: left;
+        }
+        .card h3 {
+            margin: 0 0 10px;
+            font-size: 20px;
+            color: #333;
+        }
+        .card p {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #666;
+        }
+        .status {
+            font-weight: bold;
+            text-transform: capitalize;
+        }
+    </style>
+    <script>
+        async function fetchWorkingContracts() {
+            try {
+                const response = await fetch('fetch_working_contracts.php');
+                const data = await response.json();
+
+                if (data.success) {
+                    const mainElement = document.getElementById('main');
+                    mainElement.innerHTML = ''; // Clear existing content
+
+                    data.contracts.forEach(contract => {
+                        const card = document.createElement('div');
+                        card.classList.add('card');
+                        card.innerHTML = `
+                            <h3>Client: ${contract.clientName}</h3>
+                            <p><strong>Address:</strong> ${contract.clientAddress}</p>
+                            <p><strong>Rating:</strong> ${contract.clientRating} / 5</p>
+                            <p><strong>Start Date:</strong> ${contract.startDate}</p>
+                            <p><strong>End Date:</strong> ${contract.endDate}</p>
+                            <p><strong>Daily Hours Worked:</strong> ${contract.dailyHoursWorked} hours</p>
+                            <p class="status"><strong>Status:</strong> ${contract.status}</p>
+                        `;
+                        mainElement.appendChild(card);
+                    });
+                } else {
+                    console.error('Error fetching contracts:', data.message);
+                    document.getElementById('main').innerHTML = `<p>No contracts found.</p>`;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('main').innerHTML = `<p>Failed to load contracts.</p>`;
+            }
+        }
+
+        window.onload = fetchWorkingContracts;
+    </script>
+</head>
+<body>
+    <header>
+        <h1>Working Contracts</h1>
+    </header>
+    <main id="main">
+        <!-- Contracts will be dynamically inserted here -->
+    </main>
+</body>
+</html>

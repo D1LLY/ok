@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Contract</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 20px;
+            width: 100%;
+            text-align: center;
+	        nav {
+            background-color: #0056b3;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            padding: 10px 0;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        }
+        main {
+            margin-top: 20px;
+            width: 90%;
+            max-width: 1000px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+        .card {
+            background-color: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: left;
+        }
+        .card h3 {
+            margin: 0 0 10px;
+            font-size: 20px;
+            color: #333;
+        }
+        .card p {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #666;
+        }
+        .card button {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+        .card button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+    <script>
+        async function fetchCareRequests() {
+            try {
+                const response = await fetch('find_contract.php'); // Call the backend
+                const data = await response.json(); // Parse the JSON response
+
+                if (data.success) {
+                    populateListings(data.requests); // Populate the listings if successful
+                } else {
+                    document.getElementById('main').innerHTML = `<p>No care requests found.</p>`;
+                    console.error(data.message);
+                }
+            } catch (error) {
+                console.error('Error fetching care requests:', error);
+                document.getElementById('main').innerHTML = `<p>Failed to load care requests.</p>`;
+            }
+        }
+
+        function populateListings(requests) {
+            const mainElement = document.getElementById('main');
+            mainElement.innerHTML = ''; // Clear existing content
+
+            requests.forEach(request => {
+                const card = document.createElement('div');
+                card.classList.add('card');
+                const totalHours = calculateHours(request.startTime, request.endTime);
+
+                card.innerHTML = `
+                    <h3>Client: ${request.clientName}</h3>
+		    <p><strong>Request ID:</strong> ${request.requestID}</p>
+                    <p><strong>Parent:</strong> ${request.parentName}, Age: ${request.parentAge}</p>
+                    <p><strong>Needs:</strong> ${request.parentNeeds}</p>
+                    <p><strong>Start Date:</strong> ${request.startDate}</p>
+                    <p><strong>End Date:</strong> ${request.endDate}</p>
+                    <p><strong>Start Time:</strong> ${request.startTime}</p>
+                    <p><strong>End Time:</strong> ${request.endTime}</p>
+                    <p><strong>Total Hours Daily:</strong> ${totalHours} hours</p>
+                    <button onclick='selectContract(${JSON.stringify(request)})'>Select Contract</button>
+                `;
+                mainElement.appendChild(card);
+            });
+        }
+
+        function calculateHours(startTime, endTime) {
+            if (!startTime || !endTime) return "Invalid time";
+
+            const start = new Date(`1970-01-01T${startTime}Z`);
+            const end = new Date(`1970-01-01T${endTime}Z`);
+
+            let diff = (end - start) / (1000 * 60 * 60); // Difference in hours
+            if (diff < 0) {
+                diff += 24; // Handle cases where end time is after midnight
+            }
+
+            return diff.toFixed(2); // Round to 2 decimal places
+        }
+
+        function selectContract(requestData) {
+            const request = JSON.parse(decodeURIComponent(JSON.stringify(requestData)));
+            const params = new URLSearchParams({
+               clientName: requestData.clientName,
+        	startDate: requestData.startDate,
+        	endDate: requestData.endDate,
+        	startTime: requestData.startTime,
+        	endTime: requestData.endTime,
+        	requestID: requestData.requestID 
+            });
+
+            window.location.href = `submit_contract.html?${params.toString()}`;
+        }
+
+        // Call the fetchCareRequests function when the page loads
+        window.onload = fetchCareRequests;
+    </script>
+</head>
+<body>
+    <header>
+        <h1>Find Contract</h1>
+    </header>
+	<header>
+           <nav>
+	<a href="home.html">Home</a>
+        <a href="RequestCare.html">Request Caregiver</a>
+        <a href="findContract.html">Caregiver Listings</a>
+        <a href="submit_contract.html">Create Contract</a>
+        <a href="updateProfile.html">Update Profile</a>
+        <a href="myProfile.html">View Profile</a>
+    </nav>
+    </header>
+    <main id="main">
+        <!-- Listings will be dynamically inserted here -->
+    </main>
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Care Listings</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 20px;
+            width: 100%;
+            text-align: center;
+        }
+        main {
+            margin-top: 20px;
+            width: 90%;
+            max-width: 1000px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+        .card {
+            background-color: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: left;
+        }
+        .card h3 {
+            margin: 0 0 10px;
+            font-size: 20px;
+            color: #333;
+        }
+        .card p {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+    <script>
+        async function fetchCareRequests() {
+            try {
+                const response = await fetch('fetch_care_listings.php');
+                const data = await response.json();
+
+                if (data.success) {
+                    populateListings(data.requests);
+                } else {
+                    document.getElementById('main').innerHTML = `<p>No care requests found.</p>`;
+                    console.error(data.message);
+                }
+            } catch (error) {
+                console.error('Error fetching care listings:', error);
+            }
+        }
+
+        function populateListings(requests) {
+            const mainElement = document.getElementById('main');
+            mainElement.innerHTML = ''; // Clear existing content
+
+            requests.forEach(request => {
+                const card = document.createElement('div');
+                card.classList.add('card');
+                const totalHours = calculateHours(request.startTime, request.endTime);
+
+                card.innerHTML = `
+                    <h3>Client: ${request.clientName}</h3>
+                    <p><strong>Parent:</strong> ${request.parentName}, Age: ${request.parentAge}</p>
+                    <p><strong>Needs:</strong> ${request.parentNeeds}</p>
+                    <p><strong>Start Date:</strong> ${request.startDate}</p>
+                    <p><strong>Start Time:</strong> ${request.startTime}</p>
+                    <p><strong>End Time:</strong> ${request.endTime}</p>
+                    <p><strong>Total Hours Daily:</strong> ${totalHours} hours</p>
+                `;
+                mainElement.appendChild(card);
+            });
+        }
+
+        function calculateHours(startTime, endTime) {
+            const start = new Date(`1970-01-01T${startTime}Z`);
+            const end = new Date(`1970-01-01T${endTime}Z`);
+            const diff = (end - start) / (1000 * 60 * 60);
+            return diff > 0 ? diff : 24 + diff; // Handle cases where end time is after midnight
+        }
+
+        window.onload = fetchCareRequests;
+    </script>
+</head>
+<body>
+    <header>
+        <h1>Care Listings</h1>
+    </header>
+    <main id="main">
+        <!-- Listings will be dynamically inserted here -->
+    </main>
+</body>
+</html>

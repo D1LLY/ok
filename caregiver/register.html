@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 20px 0;
+        }
+        main {
+            margin: 20px auto;
+            width: 400px;
+        }
+        form {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        input, button {
+            width: 100%;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .add-parent {
+            margin-top: 10px;
+            text-align: left;
+            cursor: pointer;
+            color: #007bff;
+            text-decoration: underline;
+        }
+    </style>
+    <script>
+        let parentCount = 1;
+
+        function addParentField() {
+            parentCount++;
+            const parentDiv = document.createElement('div');
+            parentDiv.innerHTML = `
+                <h4>Parent ${parentCount}</h4>
+                <input type="text" name="parentName[]" placeholder="Parent Name" required>
+                <input type="number" name="parentAge[]" placeholder="Parent Age" min="0" required>
+                <textarea name="parentNeeds[]" placeholder="Parent Needs" rows="3" required></textarea>
+            `;
+            document.getElementById('parentFields').appendChild(parentDiv);
+        }
+    </script>
+</head>
+<body>
+    <header>
+        <h1>Register</h1>
+    </header>
+    <main>
+        <form action="register.php" method="POST">
+            <input type="text" name="username" placeholder="Username" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <input type="text" name="address" placeholder="Address" required>
+            <input type="text" name="phoneNumber" placeholder="Phone Number (e.g., 1234567890)" required>
+            <input type="number" name="availability" placeholder="Total Time Available Each Week (Hours)" min="0" required>
+
+            <h3>Parent Information</h3>
+            <div id="parentFields">
+                <div>
+                    <h4>Parent 1</h4>
+                    <input type="text" name="parentName[]" placeholder="Parent Name" required>
+                    <input type="number" name="parentAge[]" placeholder="Parent Age" min="0" required>
+                    <textarea name="parentNeeds[]" placeholder="Parent Needs" rows="3" required></textarea>
+                </div>
+            </div>
+            <div class="add-parent" onclick="addParentField()">+ Add Another Parent</div>
+
+            <button type="submit">Register</button>
+        </form>
+    </main>
+</body>
+</html>
